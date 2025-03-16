@@ -1,0 +1,107 @@
+schema: '2.0'
+stages:
+  data_split:
+    cmd: python src/mlProject/components/data_split.py data/data.csv
+    deps:
+    - path: src/mlProject/components/data_split.py
+      hash: md5
+      md5: 1f0647d7bbc5535821086ac6fabe6a1a
+      size: 1291
+    params:
+      params.yaml:
+        base.random_state: 47
+        data_source.local_path: https://raw.githubusercontent.com/TripathiAshutosh/dataset/main/red_wine.csv
+        split.split_ratio: 0.2
+    outs:
+    - path: data/split
+      hash: md5
+      md5: fb8afee627054aa7017e10d22457ce49.dir
+      size: 92145
+      nfiles: 2
+  data_processing:
+    cmd: python src/mlProject/components/data_processing.py data/processed
+    deps:
+    - path: data/split
+      hash: md5
+      md5: fb8afee627054aa7017e10d22457ce49.dir
+      size: 92145
+      nfiles: 2
+    - path: src/mlProject/components/data_processing.py
+      hash: md5
+      md5: f9328a5ce9fd23dd845fcd06de47cfea
+      size: 1416
+    params:
+      params.yaml:
+        process.dir: data/processed
+        process.test_file: final_test.csv
+        process.train_file: final_train.csv
+        split.dir: data/split
+        split.test_file: test.csv
+        split.train_file: train.csv
+    outs:
+    - path: data/processed
+      hash: md5
+      md5: 95aa4390deb4fc293e1d4f699a6d8a29.dir
+      size: 92145
+      nfiles: 2
+  train:
+    cmd: python src/mlProject/components/train.py data/features model/model.pkl
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: 95aa4390deb4fc293e1d4f699a6d8a29.dir
+      size: 92145
+      nfiles: 2
+    - path: src/mlProject/components/train.py
+      hash: md5
+      md5: e2b5eb4921c389d2a2493e574c29613d
+      size: 2399
+    params:
+      params.yaml:
+        base.random_state: 47
+        base.target_col: quality
+        model_dir: model
+        process.dir: data/processed
+        process.test_file: final_test.csv
+        process.train_file: final_train.csv
+        train.n_est: 10
+    outs:
+    - path: model/model.pkl
+      hash: md5
+      md5: cb5837eec002caa9563790de56fc729e
+      size: 168104
+  evaluate:
+    cmd: python src/mlProject/components/evaluate.py model/model.pkl data/processed
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: 95aa4390deb4fc293e1d4f699a6d8a29.dir
+      size: 92145
+      nfiles: 2
+    - path: model/model.pkl
+      hash: md5
+      md5: cb5837eec002caa9563790de56fc729e
+      size: 168104
+    - path: src/mlProject/components/evaluate.py
+      hash: md5
+      md5: 6a4b32d865b0fed30d98894e6c8fcd69
+      size: 6758
+    outs:
+    - path: eval/importance.png
+      hash: md5
+      md5: bc6fc4224b65891835f148f1bf0bb371
+      size: 19206
+    - path: eval/live/metrics.json
+      hash: md5
+      md5: 6149b723bc26b56cefd106ba94e6c0e1
+      size: 196
+    - path: eval/live/plots
+      hash: md5
+      md5: d80b7475b94b98bc3cf530cdcd592fd7.dir
+      size: 100410
+      nfiles: 4
+    - path: eval/prc
+      hash: md5
+      md5: f912197ec11c7ca7f9fc6992f9e6a116.dir
+      size: 2845
+      nfiles: 2
