@@ -19,7 +19,8 @@ $ git push --tags
 
 ```sh
 $ dvc metrics show
-$ dvc plots show
 $ dvc metrics diff
+$ dvc params diff
+$ dvc plots show
 $ dvc plots diff
 ```
